@@ -2,7 +2,7 @@ require 'colorize'
 require './piece.rb'
 
 class Board
-  attr_accessor :captured_pieces
+  attr_accessor :captured_pieces, :grid
 
   def initialize(grid = nil)
     @grid = grid.nil? ? generate_grid : grid
@@ -53,7 +53,7 @@ class Board
   end
 
   def generate_grid
-    grid = Array.new(8) { Array.new { nil } }
+    grid = Array.new(8) { Array.new(8) { nil } }
 
     make_rows(grid, 0, 2, :red)
     make_rows(grid, 3, 4)
