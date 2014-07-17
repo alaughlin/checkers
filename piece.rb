@@ -7,6 +7,9 @@ end
 class CantJumpOwnManError < ArgumentError
 end
 
+class NoPieceToJumpError < ArgumentError
+end
+
 class Piece
   attr_reader :color
 
@@ -42,24 +45,15 @@ class Piece
 
   def perform_jump(target)
     if @grid[target].nil?
-      if @color == :red
-        jumped_piece = get_jumped_piece(target)
-        if @grid[jumped_piece].color == @color
-          raise CantJumpOwnManError
-        else
-          @grid[@position] = nil
-          @position = target
-          @grid[@position] = self
-        end
-      elsif @color == :white
-        jumped_piece = get_jumped_piece(target)
-        if @grid[jumped_piece].color == @color
-          raise CantJumpOwnManError
-        else
-          @grid[@position] = nil
-          @position = target
-          @grid[@position] = self
-        end
+      jumped_piece = get_jumped_piece(target)
+      if @grid[jumped_piece].nil?
+        raise NoPieceToJumpError
+      elsif @grid[jumped_piece].color == @color
+        raise CantJumpOwnManError
+      else
+        @grid[@position] = nil
+        @position = target
+        @grid[@position] = self
       end
     else
       raise SomeoneThereError
