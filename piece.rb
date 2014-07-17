@@ -1,7 +1,15 @@
 class InvalidMoveError < ArgumentError
 end
 
+class SomeoneThereError < ArgumentError
+end
+
+class CantJumpOwnManError < ArgumentError
+end
+
 class Piece
+  attr_reader :color
+
   def initialize(color, position, grid, kinged = false)
     @color, @position, @grid, @kinged = color, position, grid, kinged
   end
@@ -13,8 +21,10 @@ class Piece
 
     if jump_offsets.include?(current_offset)
       perform_jump(target)
-    else slide_offsets.include?(current_offset)
+    elsif slide_offsets.include?(current_offset)
       perform_slide(target)
+    else
+      raise InvalidMoveError
     end
 
     nil
@@ -26,17 +36,33 @@ class Piece
       @position = target
       @grid[@position] = self
     else
-      raise InvalidMoveError
+      raise SomeoneThereError
     end
   end
 
   def perform_jump(target)
     if @grid[target].nil?
-      @grid[@position] = nil
-      @position = target
-      @grid[@position] = self
+      if @color == :red
+        jumped_piece = [target[0] - 1, target[1] - 1]
+        if @grid[jumped_piece].color == @color
+          raise CantJumpOwnManError
+        else
+          @grid[@position] = nil
+          @position = target
+          @grid[@position] = self
+        end
+      elsif @color == :white
+        jumped_piece = [target[0] + 1, target[1] + 1]
+        if @grid[jumped_piece].color == @color
+          raise CantJumpOwnManError
+        else
+          @grid[@position] = nil
+          @position = target
+          @grid[@position] = self
+        end
+      end
     else
-      raise InvalidMoveError
+      raise SomeoneThereError
     end
   end
 
