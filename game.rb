@@ -31,18 +31,27 @@ class Game
   end
 
   def play
-    while true
+    until won?
       @board.display
       print "Enter your move (b6,a5): "
-      input = gets.chomp
+      begin
+        input = gets.chomp
 
-      input = input.split(",")
+        input = input.split(",")
 
-      src = [ROWS[input[0][1]], COLS[input[0][0]]]
-      target = [ROWS[input[1][1]], COLS[input[1][0]]]
+        src = [ROWS[input[0][1]], COLS[input[0][0]]]
+        target = [ROWS[input[1][1]], COLS[input[1][0]]]
 
-      @board.move(src, target)
+        @board.move(src, target)
+      rescue InvalidMoveError
+        print "Invalid move! Try again: "
+        retry
+      end
     end
+  end
+
+  def won?
+    false
   end
 end
 
