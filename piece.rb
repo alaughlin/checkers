@@ -43,7 +43,7 @@ class Piece
   def perform_jump(target)
     if @grid[target].nil?
       if @color == :red
-        jumped_piece = [target[0] - 1, target[1] - 1]
+        jumped_piece = get_jumped_piece(target)
         if @grid[jumped_piece].color == @color
           raise CantJumpOwnManError
         else
@@ -52,7 +52,7 @@ class Piece
           @grid[@position] = self
         end
       elsif @color == :white
-        jumped_piece = [target[0] + 1, target[1] + 1]
+        jumped_piece = get_jumped_piece(target)
         if @grid[jumped_piece].color == @color
           raise CantJumpOwnManError
         else
@@ -72,6 +72,14 @@ class Piece
 
   def jump_diffs(color)
     color == :red ? [[2, -2], [2, 2]] : [[-2, -2], [-2, 2]]
+  end
+
+  def get_jumped_piece(target)
+    if @color == :red
+      [target[0] - 1, target[1] - 1]
+    else
+      [target[0] + 1, target[1] + 1]
+    end
   end
 
   def maybe_promote
