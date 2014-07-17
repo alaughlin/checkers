@@ -26,7 +26,7 @@ class Board
         print piece.nil? ? render_nil(x, y) : piece.render
       end
 
-      puts ""
+      puts
     end
 
     nil
@@ -41,7 +41,6 @@ class Board
 
     Board.new(new_grid)
   end
-
 
   private
   def render_nil(x, y)

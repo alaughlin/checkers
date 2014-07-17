@@ -58,17 +58,26 @@ class Piece
       new_board = @board.dup
       target = [offset[0] + piece.position[0], offset[1] + piece.position[1]]
 
-      can_i_jump?(target, new_board)
+      puts "can piece @ #{piece.position} jump to #{target}?"
+
+      jumped_piece = get_jumped_piece(target)
+      puts "jumped piece will be @ #{jumped_piece}"
+
+      can_i_jump?(target, jumped_piece, @board)
     end
   end
 
-  def can_i_jump?(target, board)
+  def can_i_jump?(target, jumped_piece, board)
     if (target[0] >= 0 && target[0] < 8) && (target[1] >= 0 && target[1] < 8)
       return false unless board[target].nil?
+      puts "target nil..."
 
-      jumped_piece = get_jumped_piece(target)
       return false if board[jumped_piece].nil?
+      puts "jumped piece not nil..."
+
+      puts "jumped_piece color: #{board[jumped_piece].color}"
       return false if board[jumped_piece].color == @color
+      puts "jumped piece not my color..."
 
       true
     else
@@ -77,7 +86,8 @@ class Piece
   end
 
   def perform_jump(target, board)
-    if can_i_jump?(target, board)
+    jumped_piece = get_jumped_piece(target)
+    if can_i_jump?(target, jumped_piece, board)
       # set position of piece that was moved...
       board[@position] = nil
       board[target] = self
@@ -85,7 +95,6 @@ class Piece
       @position = target
 
       # remove jumped piece
-      jumped_piece = get_jumped_piece(target)
       board[jumped_piece] = nil
 
       true
@@ -116,14 +125,21 @@ class Piece
 
   def get_jumped_piece(target)
     if @color == :red
-      [target[0] - 1, target[1] - 1]
+      if @position[1] < target[1]
+        [target[0] - 1, target[1] - 1]
+      else
+        [target[0] - 1, target[1] + 1]
+      end
     else
-      [target[0] + 1, target[1] + 1]
+      if @position[1] < target[1]
+        [target[0] + 1, target[1] - 1]
+      else
+        [target[0] + 1, target[1] + 1]
+      end
     end
   end
 
   def maybe_promote
-
   end
 
   def render
