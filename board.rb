@@ -31,7 +31,11 @@ class Board
 
   private
   def render_nil(x, y)
-    "  "
+    if (x.even? && y.odd?) || (x.odd? && y.even?)
+      "   ".colorize(:background => :black)
+    else
+      "   ".colorize(:background => :white)
+    end
   end
 
   def generate_grid

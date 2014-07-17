@@ -6,9 +6,9 @@ class Piece
 
   def render
     if @color == :white
-      " ● ".colorize(:color => :light_white)
+      " ● ".colorize(:color => :light_white).colorize(:background => :black)
     else
-      " ● ".colorize(:color => :red)
+      " ● ".colorize(:color => :red).colorize(:background => :black)
     end
   end
 end
