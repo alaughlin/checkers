@@ -27,7 +27,7 @@ class Game
   }
 
   def initialize
-    @board = Board.new
+    @board = Board.new(true)
   end
 
   def play
@@ -42,7 +42,7 @@ class Game
         src = [ROWS[input[0][1]], COLS[input[0][0]]]
         target = [ROWS[input[1][1]], COLS[input[1][0]]]
 
-        @board.move(src, target)
+        @board.move([ [[2,1], [3,0]], [[3,0], [4,1]] ])
       rescue InvalidMoveError
         print "Invalid move! Try again: "
         retry

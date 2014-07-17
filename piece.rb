@@ -1,20 +1,10 @@
-class InvalidMoveError < ArgumentError
-end
-
-class SomeoneThereError < ArgumentError
-end
-
-class CantJumpOwnManError < ArgumentError
-end
-
-class NoPieceToJumpError < ArgumentError
-end
+require 'debugger'
 
 class Piece
   attr_reader :color
   attr_accessor :position, :board
 
-  def initialize(color, position, board, kinged = false)
+  def initialize(color, position, board = nil, kinged = false)
     @color, @position, @board, @kinged = color, position, board, kinged
   end
 
@@ -30,48 +20,65 @@ class Piece
   end
 
   def move(target)
-    slide_offsets = slide_diffs(@color)
-    jump_offsets = jump_diffs(@color)
-    current_offset = [target[0] - @position[0], target[1] - @position[1]]
+    slide_offsets = slide_diffs(color)
+    jump_offsets = jump_diffs(color)
+    target_offset = [target[0] - position[0], target[1] - position[1]]
 
     jumps_available = get_your_pieces.select do |piece|
       are_jumps_available?(piece, jump_offsets)
     end
 
-    if jump_offsets.include?(current_offset)
-      perform_jump(target, @board)
-    elsif slide_offsets.include?(current_offset)
+    if jump_offsets.include?(target_offset)
+      perform_jump(target)
+    elsif slide_offsets.include?(target_offset)
       if jumps_available.length > 0
-        raise InvalidMoveError
+        return false
       else
-        perform_slide(target, @board)
+        perform_slide(target)
       end
     else
-      raise InvalidMoveError
+      return false
     end
 
-    nil
+    true
+  end
+
+  def valid_move_seq?(move_sequence)
+    new_board = @board.dup
+
+    begin
+      new_self = new_board[@position]
+      new_self.perform_moves!(move_sequence)
+    rescue InvalidMoveError
+      false
+    end
+
+    true
   end
 
   def perform_moves(move_sequence)
-    if move_sequence.length == 1
-      move(move_seqeunce[0][0])
-    else
+    if valid_move_seq?(move_sequence)
+      perform_moves!(move_sequence)
+    end
+  end
 
+  def perform_moves!(move_sequence)
+    move_sequence.each do |step|
+      target = step[1]
+      raise InvalidMoveError unless move(target)
     end
   end
 
   def are_jumps_available?(piece, offsets)
     offsets.any? do |offset|
-      new_board = @board.dup
       target = [offset[0] + piece.position[0], offset[1] + piece.position[1]]
       jumped_piece = get_jumped_piece(target)
 
-      can_i_jump?(target, jumped_piece, @board)
+      can_i_jump?(target, jumped_piece)
     end
   end
 
-  def can_i_jump?(target, jumped_piece, board)
+  def can_i_jump?(target, jumped_piece)
     if (target[0] >= 0 && target[0] < 8) && (target[1] >= 0 && target[1] < 8)
       return false unless board[target].nil?
       return false if board[jumped_piece].nil?
@@ -83,7 +90,7 @@ class Piece
     end
   end
 
-  def perform_jump(target, board)
+  def perform_jump(target)
     jumped_piece = get_jumped_piece(target)
     if can_i_jump?(target, jumped_piece, board)
       # set position of piece that was moved...
@@ -94,22 +101,14 @@ class Piece
 
       # remove jumped piece
       board[jumped_piece] = nil
-
-      true
-    else
-      false
     end
   end
 
-  def perform_slide(target, board)
+  def perform_slide(target)
     if board[target].nil?
       board[@position] = nil
       board[target] = self
       @position = target
-
-      true
-    else
-      false
     end
   end
 
@@ -122,14 +121,14 @@ class Piece
   end
 
   def get_jumped_piece(target)
-    if @color == :red
-      if @position[1] < target[1]
+    if color == :red
+      if position[1] < target[1]
         [target[0] - 1, target[1] - 1]
       else
         [target[0] - 1, target[1] + 1]
       end
     else
-      if @position[1] < target[1]
+      if position[1] < target[1]
         [target[0] + 1, target[1] - 1]
       else
         [target[0] + 1, target[1] + 1]
@@ -141,7 +140,7 @@ class Piece
   end
 
   def render
-    if @color == :white
+    if color == :white
       " ● ".colorize(:color => :light_white).colorize(:background => :black)
     else
       " ● ".colorize(:color => :red).colorize(:background => :black)

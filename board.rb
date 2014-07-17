@@ -1,15 +1,39 @@
+require 'debugger'
 require './piece.rb'
+
+class InvalidMoveError < ArgumentError
+end
+
+class SomeoneThereError < ArgumentError
+end
+
+class CantJumpOwnManError < ArgumentError
+end
+
+class NoPieceToJumpError < ArgumentError
+end
 
 class Board
   attr_accessor :captured_pieces, :grid
 
-  def initialize(grid = nil)
-    @grid = grid.nil? ? generate_grid : grid
+  def self.blank_grid
+    Array.new(8) { Array.new(8) { nil } }
+  end
+
+  def initialize(new_game)
+    @grid = new_game ? generate_grid : self.class.blank_grid
     @captured_pieces = []
   end
 
-  def move(src, target)
-    self[src].move(target)
+  def move(move_sequence)
+    begin
+      start_pos = move_sequence[0][0]
+      self[start_pos].perform_moves(move_sequence)
+    rescue InvalidMoveError
+      false
+    end
+
+    true
   end
 
   def [](pos)
@@ -24,6 +48,7 @@ class Board
 
   def display
     puts "   A  B  C  D  E  F  G  H"
+
     @grid.each_with_index do |row, x|
       print "#{8 - x} "
       row.each_with_index do |col, y|
@@ -33,18 +58,17 @@ class Board
 
       puts
     end
-
-    nil
   end
 
   def dup
-    new_grid = @grid.map do |row|
-      row.map do |piece|
-        piece.nil? ? nil : piece.dup
-      end
+    new_board = Board.new(false)
+
+    @grid.flatten.compact.map do |piece|
+      new_piece = Piece.new(piece.color, piece.position.dup, new_board)
+      new_board[piece.position] = new_piece
     end
 
-    Board.new(new_grid)
+    new_board
   end
 
   private
