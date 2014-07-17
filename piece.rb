@@ -12,15 +12,18 @@ end
 
 class Piece
   attr_reader :color
+  attr_accessor :position, :board
 
-  def initialize(color, position, grid, kinged = false)
-    @color, @position, @grid, @kinged = color, position, grid, kinged
+  def initialize(color, position, board, kinged = false)
+    @color, @position, @board, @kinged = color, position, board, kinged
   end
 
   def move(target)
     slide_offsets = slide_diffs(@color)
     jump_offsets = jump_diffs(@color)
     current_offset = [target[0] - @position[0], target[1] - @position[1]]
+
+    valid_moves =
 
     if jump_offsets.include?(current_offset)
       perform_jump(target)
@@ -35,25 +38,32 @@ class Piece
 
   def perform_slide(target)
     if @grid[target].nil?
-      @grid[@position] = nil
+      @board[@position] = nil
+      @board[@position] = self
+
       @position = target
-      @grid[@position] = self
     else
       raise SomeoneThereError
     end
   end
 
   def perform_jump(target)
-    if @grid[target].nil?
+    if @board[target].nil?
       jumped_piece = get_jumped_piece(target)
-      if @grid[jumped_piece].nil?
+
+      if @board[jumped_piece].nil?
         raise NoPieceToJumpError
-      elsif @grid[jumped_piece].color == @color
+      elsif @board[jumped_piece].color == @color
         raise CantJumpOwnManError
       else
-        @grid[@position] = nil
+        # set position of piece that was moved...
+        @board[@position] = nil
         @position = target
-        @grid[@position] = self
+        @board[@position] = self
+
+        # remove jumped piece
+        @board[jumped_piece].position = nil
+        @board[jumped_piece] = nil
       end
     else
       raise SomeoneThereError

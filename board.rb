@@ -2,8 +2,11 @@ require 'colorize'
 require './piece.rb'
 
 class Board
+  attr_accessor :captured_pieces
+
   def initialize(grid = nil)
     @grid = grid.nil? ? generate_grid : grid
+    @captured_pieces = []
   end
 
   def [](pos)
@@ -28,6 +31,17 @@ class Board
 
     nil
   end
+
+  def dup
+    new_grid = @grid.map do |row|
+      row.map do |piece|
+        piece.nil? ? nil : piece.dup
+      end
+    end
+
+    Board.new(new_grid)
+  end
+
 
   private
   def render_nil(x, y)
