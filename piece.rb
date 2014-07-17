@@ -53,15 +53,19 @@ class Piece
     nil
   end
 
+  def perform_moves(move_sequence)
+    if move_sequence.length == 1
+      move(move_seqeunce[0][0])
+    else
+
+    end
+  end
+
   def are_jumps_available?(piece, offsets)
     offsets.any? do |offset|
       new_board = @board.dup
       target = [offset[0] + piece.position[0], offset[1] + piece.position[1]]
-
-      puts "can piece @ #{piece.position} jump to #{target}?"
-
       jumped_piece = get_jumped_piece(target)
-      puts "jumped piece will be @ #{jumped_piece}"
 
       can_i_jump?(target, jumped_piece, @board)
     end
@@ -70,14 +74,8 @@ class Piece
   def can_i_jump?(target, jumped_piece, board)
     if (target[0] >= 0 && target[0] < 8) && (target[1] >= 0 && target[1] < 8)
       return false unless board[target].nil?
-      puts "target nil..."
-
       return false if board[jumped_piece].nil?
-      puts "jumped piece not nil..."
-
-      puts "jumped_piece color: #{board[jumped_piece].color}"
       return false if board[jumped_piece].color == @color
-      puts "jumped piece not my color..."
 
       true
     else

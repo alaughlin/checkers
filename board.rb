@@ -1,4 +1,3 @@
-require 'colorize'
 require './piece.rb'
 
 class Board
@@ -7,6 +6,10 @@ class Board
   def initialize(grid = nil)
     @grid = grid.nil? ? generate_grid : grid
     @captured_pieces = []
+  end
+
+  def move(src, target)
+    self[src].move(target)
   end
 
   def [](pos)
@@ -20,7 +23,9 @@ class Board
   end
 
   def display
+    puts "   A  B  C  D  E  F  G  H"
     @grid.each_with_index do |row, x|
+      print "#{8 - x} "
       row.each_with_index do |col, y|
         piece = @grid[x][y]
         print piece.nil? ? render_nil(x, y) : piece.render
