@@ -1,3 +1,4 @@
+require 'colorize'
 require './piece.rb'
 
 class Board
@@ -13,6 +14,10 @@ class Board
   def []=(pos, obj)
     x, y = pos
     @grid[x][y] = obj
+  end
+
+  def display
+
   end
 
   private
