@@ -1,5 +1,6 @@
 class Piece
   def initialize(color, position, grid, kinged = false)
+    puts "making piece!"
     @color, @position, @grid, @kinged = color, position, grid, kinged
   end
 

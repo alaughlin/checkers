@@ -17,27 +17,41 @@ class Board
   end
 
   def display
+    @grid.each_with_index do |row, x|
+      row.each_with_index do |col, y|
+        piece = @grid[x][y]
+        print piece.nil? ? render_nil(x, y) : piece.render
+      end
 
+      puts ""
+    end
+
+    nil
   end
 
   private
+  def render_nil(x, y)
+    "  "
+  end
+
   def generate_grid
     grid = Array.new(8) { Array.new { nil } }
 
-    make_rows(grid, fst, lst, :red)
-    make_rows(grid, fst, lst)
-    make_rows(grid, fst, lst, :white)
+    make_rows(grid, 0, 2, :red)
+    make_rows(grid, 3, 4)
+    make_rows(grid, 5, 7, :white)
 
     grid
   end
 
   def make_rows(grid, fst, lst, color = nil)
     fst.upto(lst) do |row|
-      0.upto(y) do |col|
+      0.upto(7) do |col|
         if ((row.even? && col.odd?) || (row.odd? && col.even?)) && !color.nil?
-          grid[row, col] = Piece.new(color, [row, col], grid)
+          grid[row][col] = Piece.new(color, [row, col], self)
         else
-          grid[row, col] = nil
+          grid[row][col] = nil
+        end
       end
     end
   end
